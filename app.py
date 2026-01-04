@@ -3,10 +3,10 @@ import pandas as pd
 import joblib
 import os
 
-# --- Cấu hình trang ---
+# --- Page Configuration ---
 st.set_page_config(page_title="Diabetes Risk Predictor", layout="wide")
 
-# --- 1. Tối ưu hóa: Load Model ---
+# --- 1. Optimization: Load Model ---
 @st.cache_resource
 def load_model(path):
     if os.path.exists(path):
@@ -16,16 +16,16 @@ def load_model(path):
 model_path = 'diabetes_xgb_model_v1.joblib'
 model = load_model(model_path)
 
-# --- 2. Bộ chuyển đổi đơn vị (Helper Function) ---
+# --- 2. Unit Converter ---
 def convert_units():
     with st.sidebar.expander("🔄 Unit Converter", expanded=False):        
-        # Cân nặng & Chiều cao
+        # Weight & Height
         lbs = st.number_input("Weight (lbs)", value=154.0)
         st.info(f"**{lbs / 2.2046:.2f} kg**")
     
         inches = st.number_input("Length (inch)", value=34.0)
         st.info(f"**{inches * 2.54:.2f} cm**")  
-        # Chỉ số máu (mmol/L -> mg/dL)
+        # Blood test values (mmol/L -> mg/dL)
         mmol = st.number_input("Value (mmol/L)", value=5.5)
         c1, c2 = st.columns(2)
         with c1:
@@ -35,11 +35,11 @@ def convert_units():
             st.caption("Cholesterol")
             st.info(f"**{mmol * 38.67:.1f} mg/dL**")
 
-# --- 3. Giao diện nhập liệu ---
+# --- 3. Input Interface ---
 def get_user_inputs():
     st.sidebar.header("📋 Patient Information")
     
-    convert_units() # Gọi bộ chuyển đổi
+    convert_units() # Call Unit Converter
     
     with st.sidebar.expander("🩸 Blood Test Results", expanded=True):
         chol = st.number_input("Total Cholesterol (mg/dL)", 100, 500, 200)
@@ -53,7 +53,7 @@ def get_user_inputs():
         weight = st.slider("Weight (kg)", 30, 200, 70)
         height = st.slider("Height (cm)", 100, 250, 170)
 
-    # Feature Engineering (Tạo thêm biến cho mô hình)
+    # Feature Engineering 
     ratio = stab_glu / hdl
     bmi = weight / ((height/100) ** 2)
     
@@ -65,9 +65,9 @@ def get_user_inputs():
 
 # --- 4. Main Dashboard ---
 st.title("🩺 Diabetes Risk Prediction")
-st.markdown(f"**Developer:** Luke Vu | **Target:** Applied ML Engineer")
+st.markdown(f"**Developer:** Luke Vu  |  **Target:** Applied ML Engineer")
 
-# Bảng tra cứu hiển thị trong Main Area
+# Reference Unit Conversion Table displayed in Main Area
 with st.expander("📚 Reference Unit Conversion Table"):
     st.markdown("""
     | Measurement | From Unit | Formula | To Unit (Model) |
@@ -81,25 +81,31 @@ with st.expander("📚 Reference Unit Conversion Table"):
 st.divider()
 
 if model is None:
-    st.error(f"❌ Không tìm thấy file model: `{model_path}`")
+    st.error(f"❌ Can not find file model: `{model_path}`")
     st.stop()
 
 input_df = get_user_inputs()
 
-# Hiển thị Metrics chính
+age_bins = [0, 20, 30, 40, 50, 60, 100]
+age_labels = ["<20", "21-30", "31-40", "41-50", "51-60", "60+"]
+input_df['age_group'] = pd.cut(input_df['age'], bins=age_bins, labels=age_labels)
+
+# Metrics Display
+st.subheader("📊 Key Metrics")
 col1, col2, col3 = st.columns(3)
 with col1:
     st.metric("Calculated BMI", f"{input_df['bmi'].iloc[0]:.2f}")
 with col2:
     st.metric("Glucose/HDL Ratio", f"{input_df['ratio'].iloc[0]:.2f}")
 with col3:
-    st.metric("Age Group", f"{input_df['age'].iloc[0]} yrs")
+    # Display processed Age Group
+    st.metric("Age Group", value=input_df['age_group'].iloc[0])
 
 st.subheader("📋 Input Summary")
 st.dataframe(input_df, use_container_width=True)
 
-# --- 5. Logic Dự Đoán (Prediction) ---
-if st.button("Analyze Risk Level", type="primary", use_container_width=True):
+# --- 5. Prediction ---
+if st.button("Predict Diabetes Risk", type="primary", use_container_width=True):
     prediction = model.predict(input_df)
     glyhb = prediction[0]
     
@@ -107,7 +113,7 @@ if st.button("Analyze Risk Level", type="primary", use_container_width=True):
     st.subheader("Predicted Glycated Hemoglobin (Glyhb):")
     st.info("💡 **Note:** Glyhb (HbA1c) represents average blood sugar levels over 2-3 months.")
     
-    # Logic phân loại theo tiêu chuẩn y tế
+    # Classification based on Glyhb value
     if glyhb >= 6.5:
         st.error(f"### Result: {glyhb:.2f}% (Diabetes Risk)")
     elif glyhb >= 5.7:
