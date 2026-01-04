@@ -1,7 +1,4 @@
-streamlit
-pandas
-numpy
-joblib
-xgboost
-scikit-learn
-itables
+pip install itables
+pip install kagglehub
+python download_data.py
+pip install matplotlib seaborn pandas scikit-learn joblib
