@@ -30,10 +30,10 @@ def convert_units():
         c1, c2 = st.columns(2)
         with c1:
             st.caption("Glucose")
-            st.code(f"{mmol * 18.018:.1f}")
+            st.info(f"{mmol * 18.018:.1f}")
         with c2:
             st.caption("Cholesterol")
-            st.code(f"{mmol * 38.67:.1f}")
+            st.info(f"{mmol * 38.67:.1f}")
 
 # --- 3. Giao diện nhập liệu ---
 def get_user_inputs():
