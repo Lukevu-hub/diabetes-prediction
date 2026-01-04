@@ -66,17 +66,8 @@ def get_user_inputs():
 # --- 4. Main Dashboard ---
 st.title("🩺 Diabetes Risk Prediction")
 st.markdown(f"**Developer:** Luke Vu  |  **Target:** Applied ML Engineer")
+st.info("Disclaimer: This tool is for educational purposes only and not a substitute for professional medical advice.")
 
-# Reference Unit Conversion Table displayed in Main Area
-with st.expander("📚 Reference Unit Conversion Table"):
-    st.markdown("""
-    | Measurement | From Unit | Formula | To Unit (Model) |
-    | :--- | :--- | :--- | :--- |
-    | **Glucose** | 1 mmol/L | x 18.018 | mg/dL |
-    | **Cholesterol** | 1 mmol/L | x 38.67 | mg/dL |
-    | **Weight** | 1 lb (pound) | / 2.2046 | kg |
-    | **Length** | 1 inch | x 2.54 | cm |
-    """)
 
 st.divider()
 
@@ -126,4 +117,14 @@ if st.button("Predict Diabetes Risk", type="primary", use_container_width=True):
         st.warning(f"### Result: {glyhb:.2f}% (Pre-diabetes)")
     else:
         st.success(f"### Result: {glyhb:.2f}% (Healthy / Normal)")
-st.info("Disclaimer: This tool is for educational purposes only and not a substitute for professional medical advice.")
+    st.divider()
+# Reference Unit Conversion Table displayed in Main Area
+with st.expander("📚 Reference Unit Conversion Table"):
+    st.markdown("""
+    | Measurement | From Unit | Formula | To Unit (Model) |
+    | :--- | :--- | :--- | :--- |
+    | **Glucose** | 1 mmol/L | x 18.018 | mg/dL |
+    | **Cholesterol** | 1 mmol/L | x 38.67 | mg/dL |
+    | **Weight** | 1 lb (pound) | / 2.2046 | kg |
+    | **Length** | 1 inch | x 2.54 | cm |
+    """)
