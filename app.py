@@ -50,8 +50,8 @@ def get_user_inputs():
         age = st.slider("Age", 18, 100, 45)
         waist = st.slider("Waist (cm)", 20, 150, 80)
         hip = st.slider("Hip (cm)", 20, 150, 95)
-        weight = st.slider("Weight (kg)", 30.0, 200.0, 70.0)
-        height = st.slider("Height (cm)", 100.0, 250.0, 170.0)
+        weight = st.slider("Weight (kg)", 30, 200, 70)
+        height = st.slider("Height (cm)", 100, 250, 170)
 
     # Feature Engineering (Tạo thêm biến cho mô hình)
     ratio = stab_glu / hdl
