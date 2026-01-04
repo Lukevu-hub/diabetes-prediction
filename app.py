@@ -18,7 +18,7 @@ model = load_model(model_path)
 
 # --- 2. Bộ chuyển đổi đơn vị (Helper Function) ---
 def convert_units():
-    with st.sidebar.expander("🔄 Quick Unit Converter)", expanded=False):        
+    with st.sidebar.expander("🔄 Unit Converter", expanded=False):        
         # Cân nặng & Chiều cao
         lbs = st.number_input("Weight (lbs)", value=154.0)
         st.info(f"**{lbs / 2.2046:.2f} kg**")
@@ -46,7 +46,7 @@ def get_user_inputs():
         hdl = st.number_input("HDL (mg/dL)", 10, 120, 50)
         stab_glu = st.number_input("Stabilized Glucose (mg/dL)", 40, 400, 100)
         
-    with st.sidebar.expander("📏 Physical Measurements", expanded=True):
+    with st.sidebar.expander("📏 Body Measurements", expanded=True):
         age = st.slider("Age", 18, 100, 45)
         waist = st.slider("Waist (cm)", 20, 150, 80)
         hip = st.slider("Hip (cm)", 20, 150, 95)
