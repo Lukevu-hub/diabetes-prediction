@@ -1,6 +1,8 @@
 Diabetes Risk Predictor
 ==========================
 
+**Disclaimer: This tool is for educational purposes only and not a substitute for professional medical advice.**
+-------------------
 This project is an end-to-end Machine Learning application designed to predict **Glycated Hemoglobin (Glyhb)** levels---a key indicator of diabetes risk. It includes a complete data science pipeline from Exploratory Data Analysis (EDA) and model training to a production-ready web interface built with **Streamlit**.
 
 🚀 Overview
