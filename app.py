@@ -86,12 +86,12 @@ st.markdown(f"**Developer:** Luke Vu | **Model:** XGBoost Regressor")
 # Adding a reference conversion table in the main area
 with st.expander("📚 Reference Unit Conversion Table"):
     st.markdown("""
-    | Measurement | From (Metric/US) | Formula | Result (Target) |
+    | Measurement | From Unit | Formula | To Unit (Model) |
     | :--- | :--- | :--- | :--- |
-    | **Glucose** | 1 mmol/L | $\times 18.018$ | 18 mg/dL |
-    | **Cholesterol** | 1 mmol/L | $\times 38.67$ | 38.7 mg/dL |
-    | **Weight** | 1 lb (pound) | $\div 2.2046$ | 0.453 kg |
-    | **Height/Waist** | 1 inch | $\times 2.54$ | 2.54 cm |
+    | **Glucose** | 1 mmol/L | x 18.0 | mg/dL |
+    | **Cholesterol** | 1 mmol/L | x 38.67 | mg/dL |
+    | **Weight** | 1 lb (pound) | / 2.205 | kg |
+    | **Length** | 1 inch | x 2.54 | cm |
     """)
 
 st.divider()
