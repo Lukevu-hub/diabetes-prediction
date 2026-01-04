@@ -37,7 +37,7 @@ def convert_units():
 
 # --- 3. Input Interface ---
 def get_user_inputs():
-    st.sidebar.header("📋 Patient Information")
+    st.sidebar.header("📋 Your Information")
     
     convert_units() # Call Unit Converter
     
@@ -126,6 +126,4 @@ if st.button("Predict Diabetes Risk", type="primary", use_container_width=True):
         st.warning(f"### Result: {glyhb:.2f}% (Pre-diabetes)")
     else:
         st.success(f"### Result: {glyhb:.2f}% (Healthy / Normal)")
-
-st.divider()
-st.caption("Disclaimer: This tool is for educational purposes only and not a substitute for professional medical advice.")
+st.info("Disclaimer: This tool is for educational purposes only and not a substitute for professional medical advice.")
