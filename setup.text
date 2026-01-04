@@ -1,7 +1,0 @@
-source venv/bin/activate
-pip install itables
-pip install kagglehub
-python download_data.py
-pip install matplotlib seaborn pandas scikit-learn joblib xgboost
-pip install streamlit
-streamlit run app.py
