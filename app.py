@@ -84,11 +84,6 @@ if st.button("Analyze Risk Level", type="primary", use_container_width=True):
         else:
             st.success(f"### {glyhb:.2f}% (Healthy)")
             
-    with col_res2:
-        st.info("**What does this mean?** Glyhb (A1C) reflects your average blood sugar over the past 2-3 months.")
-        # Progress bar indicating risk level
-        progress_val = min(float(glyhb) / 10.0, 1.0) 
-        st.progress(progress_val)
 
 # --- 5. FOOTER ---
 st.caption("Disclaimer: This tool is for educational purposes only and not a substitute for professional medical advice.")
