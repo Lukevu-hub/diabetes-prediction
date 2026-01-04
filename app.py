@@ -18,18 +18,13 @@ model = load_model(model_path)
 
 # --- 2. Bộ chuyển đổi đơn vị (Helper Function) ---
 def convert_units():
-    with st.sidebar.expander("🔄 Quick Unit Converter (Imperial/Metric)", expanded=False):
-        st.write("Dùng để đổi đơn vị trước khi nhập phía dưới:")
-        
+    with st.sidebar.expander("🔄 Quick Unit Converter (Imperial/Metric)", expanded=False):        
         # Cân nặng & Chiều cao
         lbs = st.number_input("Weight (lbs)", value=154.0)
-        st.info(f"➡️ **{lbs / 2.2046:.2f} kg**")
-        
+        st.info(f"**{lbs / 2.2046:.2f} kg**")
+    
         inches = st.number_input("Length (inch)", value=34.0)
-        st.info(f"➡️ **{inches * 2.54:.2f} cm**")
-        
-        st.divider()
-        
+        st.info(f"**{inches * 2.54:.2f} cm**")  
         # Chỉ số máu (mmol/L -> mg/dL)
         mmol = st.number_input("Value (mmol/L)", value=5.5)
         c1, c2 = st.columns(2)
