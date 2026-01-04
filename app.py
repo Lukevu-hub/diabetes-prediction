@@ -30,10 +30,10 @@ def convert_units():
         c1, c2 = st.columns(2)
         with c1:
             st.caption("Glucose")
-            st.info(f"{mmol * 18.018:.1f}")
+            st.info(f"**{mmol * 18.018:.1f} mg/dL**")
         with c2:
             st.caption("Cholesterol")
-            st.info(f"{mmol * 38.67:.1f}")
+            st.info(f"**{mmol * 38.67:.1f} mg/dL**")
 
 # --- 3. Giao diện nhập liệu ---
 def get_user_inputs():
@@ -50,8 +50,8 @@ def get_user_inputs():
         age = st.slider("Age", 18, 100, 45)
         waist = st.slider("Waist (cm)", 20, 150, 80)
         hip = st.slider("Hip (cm)", 20, 150, 95)
-        weight = st.number_input("Weight (kg)", 30.0, 200.0, 70.0)
-        height = st.number_input("Height (cm)", 100.0, 250.0, 170.0)
+        weight = st.slider("Weight (kg)", 30.0, 200.0, 70.0)
+        height = st.slider("Height (cm)", 100.0, 250.0, 170.0)
 
     # Feature Engineering (Tạo thêm biến cho mô hình)
     ratio = stab_glu / hdl
