@@ -1,76 +1,94 @@
-def user_input_features():
-    st.sidebar.header("Nhập thông số bệnh nhân:")
-    
-    # Nhập các chỉ số cơ bản
-    chol = st.sidebar.number_input("Cholesterol", min_value=100, max_value=500, value=200)
-    stab_glu = st.sidebar.number_input("Stabilized Glucose", min_value=40, max_value=400, value=100)
-    hdl = st.sidebar.number_input("HDL (Good Cholesterol)", min_value=10, max_value=120, value=50)
-    age = st.sidebar.slider("Age", 18, 100, 45)
-    waist = st.sidebar.slider("Waist (cm)", 20, 60, 35)
-    hip = st.sidebar.slider("Hip (cm)", 20, 60, 40)
-    
-    # Nhập Cân nặng & Chiều cao để tính BMI
-    weight_kg = st.sidebar.number_input("Weight (kg)", min_value=30.0, max_value=200.0, value=70.0)
-    height_cm = st.sidebar.number_input("Height (cm)", min_value=100.0, max_value=250.0, value=170.0)
+import streamlit as st
+import pandas as pd
+import joblib
+import os
 
-    # --- LOGIC TỰ ĐỘNG TÍNH TOÁN ---
+# --- Page Configuration ---
+st.set_page_config(page_title="Diabetes Risk Predictor", layout="wide")
+
+# --- 1. Optimization: Caching Model Loading ---
+@st.cache_resource
+def load_model(path):
+    if os.path.exists(path):
+        return joblib.load(path)
+    return None
+
+model_path = 'diabetes_xgb_model_v1.joblib'
+model = load_model(model_path)
+
+# --- 2. Input Interface ---
+def get_user_inputs():
+    st.sidebar.header("📋 Patient Information")
     
-    # 1. Tính Ratio (Tỷ lệ đường huyết trên mỡ tốt)
-    # Công thức: Ratio = Glucose / HDL
+    with st.sidebar.expander("🩸 Blood Test Results", expanded=True):
+        chol = st.number_input("Total Cholesterol (mg/dL)", 100, 500, 200)
+        hdl = st.number_input("HDL (Good Cholesterol)", 10, 120, 50)
+        stab_glu = st.number_input("Stabilized Glucose (mg/dL)", 40, 400, 100)
+        
+    with st.sidebar.expander("📏 Physical Measurements", expanded=True):
+        age = st.slider("Age", 18, 100, 45)
+        weight = st.number_input("Weight (kg)", 30.0, 200.0, 70.0)
+        height = st.number_input("Height (cm)", 100.0, 250.0, 170.0)
+        waist = st.slider("Waist (cm)", 20, 150, 80) # Sửa lại range thực tế hơn
+        hip = st.slider("Hip (cm)", 20, 150, 95)
+
+    # Feature Engineering 
     ratio = stab_glu / hdl
+    bmi = weight / ((height/100) ** 2)
     
-    # 2. Tính BMI (Body Mass Index)
-    # Công thức: BMI = weight(kg) / [height(m)]^2
-    height_m = height_cm / 100
-    bmi = weight_kg / (height_m ** 2)
-
-    # Hiển thị các chỉ số vừa tính được lên màn hình chính để user kiểm tra
-    st.sidebar.info(f"💡 Calculated Ratio: {ratio:.2f}")
-    st.sidebar.info(f"💡 Calculated BMI: {bmi:.2f}")
-
-    # Tạo DataFrame với ĐÚNG tên cột và THỨ TỰ mà mô hình XGBoost yêu cầu
     data = {
         'chol': chol, 'stab.glu': stab_glu, 'hdl': hdl, 'ratio': ratio,
         'age': age, 'waist': waist, 'hip': hip, 'bmi': bmi
     }
     return pd.DataFrame([data])
 
-# --- GIAO DIỆN CHÍNH ---
+# --- 3. MAIN DASHBOARD ---
 st.title("🩺 Diabetes Risk Prediction")
-st.write("Dự án nghiên cứu AI/ML - Luke Vu")
+st.markdown(f"**Developer:** Luke Vu | **Model:** XGBoost Regressor")
+st.divider()
 
-# 1. Kiểm tra File Model
-model_path = 'diabetes_xgb_model_v1.joblib'
+if model is None:
+    st.error(f"❌ Model file not found at `{model_path}`. Please check your directory.")
+    st.stop()
 
-if not os.path.exists(model_path):
-    st.error(f"❌ KHÔNG tìm thấy file: {model_path}")
-    st.write("Các file hiện có trong thư mục này là:", os.listdir('.'))
-else:
-    # 2. Tải mô hình
-    try:
-        model = joblib.load(model_path)
-        st.success("🚀 Mô hình đã được nạp thành công!")
-        
-        # 3. Lấy dữ liệu người dùng
-        input_df = user_input_features()
-        
-        st.subheader("📋 Thông số đã nhập")
-        st.write(input_df)
+input_df = get_user_inputs()
 
-        # 4. Dự đoán
-        if st.button("Dự đoán kết quả"):
-            prediction = model.predict(input_df)
-            result = prediction[0]
+# Show key metrics
+col1, col2, col3 = st.columns(3)
+with col1:
+    st.metric("Calculated BMI", f"{input_df['bmi'].iloc[0]:.2f}")
+with col2:
+    st.metric("Glucose/HDL Ratio", f"{input_df['ratio'].iloc[0]:.2f}")
+with col3:
+    st.metric("Age Group", f"{input_df['age'].iloc[0]} yrs")
+
+st.subheader("📋 Input Summary")
+st.dataframe(input_df, use_container_width=True)
+
+# --- 4. PREDICTION LOGIC ---
+if st.button("Analyze Risk Level", type="primary", use_container_width=True):
+    prediction = model.predict(input_df)
+    glyhb = prediction[0]
+    
+    st.markdown("---")
+    
+    # Results Display
+    col_res1, col_res2 = st.columns([1, 2])
+    
+    with col_res1:
+        st.subheader("Result:")
+        if glyhb >= 6.5:
+            st.error(f"### {glyhb:.2f}% (Diabetes)")
+        elif glyhb >= 5.7:
+            st.warning(f"### {glyhb:.2f}% (Pre-diabetes)")
+        else:
+            st.success(f"### {glyhb:.2f}% (Healthy)")
             
-            st.markdown("---")
-            st.header(f"Kết quả dự đoán Glyhb: {result:.2f}")
-            
-            if result >= 6.5:
-                st.error("⚠️ Trạng thái: Nguy cơ Tiểu đường cao")
-            elif result >= 5.7:
-                st.warning("🟠 Trạng thái: Tiền tiểu đường")
-            else:
-                st.success("✅ Trạng thái: Bình thường")
-                
-    except Exception as e:
-        st.error(f"⚠️ Lỗi khi chạy mô hình: {e}")
+    with col_res2:
+        st.info("**What does this mean?** Glyhb (A1C) reflects your average blood sugar over the past 2-3 months.")
+        # Progress bar indicating risk level
+        progress_val = min(float(glyhb) / 10.0, 1.0) 
+        st.progress(progress_val)
+
+# --- 5. FOOTER ---
+st.caption("Disclaimer: This tool is for educational purposes only and not a substitute for professional medical advice.")
