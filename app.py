@@ -25,6 +25,7 @@ def user_input_features():
     height_m = height_cm / 100
     bmi = weight_kg / (height_m ** 2)
 
+    # Hiển thị các chỉ số vừa tính được lên màn hình chính để user kiểm tra
     st.sidebar.info(f"💡 Calculated Ratio: {ratio:.2f}")
     st.sidebar.info(f"💡 Calculated BMI: {bmi:.2f}")
 
