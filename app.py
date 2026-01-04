@@ -3,10 +3,10 @@ import pandas as pd
 import joblib
 import os
 
-# --- Page Configuration ---
+# --- Cấu hình trang ---
 st.set_page_config(page_title="Diabetes Risk Predictor", layout="wide")
 
-# --- 1. Optimization: Caching Model Loading ---
+# --- 1. Tối ưu hóa: Load Model ---
 @st.cache_resource
 def load_model(path):
     if os.path.exists(path):
@@ -16,46 +16,35 @@ def load_model(path):
 model_path = 'diabetes_xgb_model_v1.joblib'
 model = load_model(model_path)
 
-# --- 2. Helper Functions for Conversion ---
-# Tại sao cần Helper functions? Để code sạch sẽ và có thể tái sử dụng.
+# --- 2. Bộ chuyển đổi đơn vị (Helper Function) ---
 def convert_units():
-    with st.sidebar.expander("🔄 Quick Unit Converter", expanded=False):
-        st.write("Convert your local units to model units:")
+    with st.sidebar.expander("🔄 Quick Unit Converter (Imperial/Metric)", expanded=False):
+        st.write("Dùng để đổi đơn vị trước khi nhập phía dưới:")
         
-        # 1. Weight: lbs to kg
+        # Cân nặng & Chiều cao
         lbs = st.number_input("Weight (lbs)", value=154.0)
-        kg_res = lbs * 0.453592
-        st.info(f"➡️ **{kg_res:.2f} kg**")
+        st.info(f"➡️ **{lbs / 2.2046:.2f} kg**")
+        
+        inches = st.number_input("Length (inch)", value=34.0)
+        st.info(f"➡️ **{inches * 2.54:.2f} cm**")
         
         st.divider()
         
-        # 2. Length: inches to cm
-        inches = st.number_input("Length (inch)", value=67.0)
-        cm_res = inches * 2.54
-        st.info(f"➡️ **{cm_res:.2f} cm**")
-        
-        st.divider()
-        
-        # 3. Glucose/Chol: mmol/L to mg/dL
-        # Note: Glucose factor is 18.0, Cholesterol is 38.67
+        # Chỉ số máu (mmol/L -> mg/dL)
         mmol = st.number_input("Value (mmol/L)", value=5.5)
-        st.write("Convert to:")
-        col_c1, col_c2 = st.columns(2)
-        with col_c1:
-            glu_mg = mmol * 18.018
+        c1, c2 = st.columns(2)
+        with c1:
             st.caption("Glucose")
-            st.code(f"{glu_mg:.1f} mg/dL")
-        with col_c2:
-            chol_mg = mmol * 38.67
+            st.code(f"{mmol * 18.018:.1f}")
+        with c2:
             st.caption("Cholesterol")
-            st.code(f"{chol_mg:.1f} mg/dL")
+            st.code(f"{mmol * 38.67:.1f}")
 
-# --- 3. Input Interface ---
+# --- 3. Giao diện nhập liệu ---
 def get_user_inputs():
     st.sidebar.header("📋 Patient Information")
     
-    # Tích hợp bộ chuyển đổi vào Sidebar
-    convert_units()
+    convert_units() # Gọi bộ chuyển đổi
     
     with st.sidebar.expander("🩸 Blood Test Results", expanded=True):
         chol = st.number_input("Total Cholesterol (mg/dL)", 100, 500, 200)
@@ -69,7 +58,7 @@ def get_user_inputs():
         weight = st.number_input("Weight (kg)", 30.0, 200.0, 70.0)
         height = st.number_input("Height (cm)", 100.0, 250.0, 170.0)
 
-    # Feature Engineering 
+    # Feature Engineering (Tạo thêm biến cho mô hình)
     ratio = stab_glu / hdl
     bmi = weight / ((height/100) ** 2)
     
@@ -79,30 +68,30 @@ def get_user_inputs():
     }
     return pd.DataFrame([data])
 
-# --- 4. MAIN DASHBOARD ---
+# --- 4. Main Dashboard ---
 st.title("🩺 Diabetes Risk Prediction")
-st.markdown(f"**Developer:** Luke Vu | **Model:** XGBoost Regressor")
+st.markdown(f"**Developer:** Luke Vu | **Target:** Applied ML Engineer")
 
-# Adding a reference conversion table in the main area
+# Bảng tra cứu hiển thị trong Main Area
 with st.expander("📚 Reference Unit Conversion Table"):
     st.markdown("""
     | Measurement | From Unit | Formula | To Unit (Model) |
     | :--- | :--- | :--- | :--- |
-    | **Glucose** | 1 mmol/L | x 18.0 | mg/dL |
+    | **Glucose** | 1 mmol/L | x 18.018 | mg/dL |
     | **Cholesterol** | 1 mmol/L | x 38.67 | mg/dL |
-    | **Weight** | 1 lb (pound) | / 2.205 | kg |
+    | **Weight** | 1 lb (pound) | / 2.2046 | kg |
     | **Length** | 1 inch | x 2.54 | cm |
     """)
 
 st.divider()
 
 if model is None:
-    st.error(f"❌ Model file not found at `{model_path}`. Please check your directory.")
+    st.error(f"❌ Không tìm thấy file model: `{model_path}`")
     st.stop()
 
 input_df = get_user_inputs()
 
-# Metrics Display
+# Hiển thị Metrics chính
 col1, col2, col3 = st.columns(3)
 with col1:
     st.metric("Calculated BMI", f"{input_df['bmi'].iloc[0]:.2f}")
@@ -114,21 +103,22 @@ with col3:
 st.subheader("📋 Input Summary")
 st.dataframe(input_df, use_container_width=True)
 
-# --- 5. PREDICTION LOGIC ---
+# --- 5. Logic Dự Đoán (Prediction) ---
 if st.button("Analyze Risk Level", type="primary", use_container_width=True):
     prediction = model.predict(input_df)
     glyhb = prediction[0]
     
-    st.markdown("---")
+    st.divider()
+    st.subheader("Predicted Glycated Hemoglobin (Glyhb):")
+    st.info("💡 **Note:** Glyhb (HbA1c) represents average blood sugar levels over 2-3 months.")
     
-    col_res1, col_res2 = st.columns([1, 2])
-    with col_res1:
-        st.subheader("Predicted result of percentage Glycated Hemoglobin - average blood sugar levels over 2-3 months:")
-        if glyhb >= 6.5:
-            st.error(f"### {glyhb:.2f}% (Diabetes)")
-        elif glyhb >= 5.7:
-            st.warning(f"### {glyhb:.2f}% (Pre-diabetes)")
-        else:
-            st.success(f"### {glyhb:.2f}% (Healthy)")
+    # Logic phân loại theo tiêu chuẩn y tế
+    if glyhb >= 6.5:
+        st.error(f"### Result: {glyhb:.2f}% (Diabetes Risk)")
+    elif glyhb >= 5.7:
+        st.warning(f"### Result: {glyhb:.2f}% (Pre-diabetes)")
+    else:
+        st.success(f"### Result: {glyhb:.2f}% (Healthy / Normal)")
 
+st.divider()
 st.caption("Disclaimer: This tool is for educational purposes only and not a substitute for professional medical advice.")
