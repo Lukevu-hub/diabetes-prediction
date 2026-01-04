@@ -123,7 +123,9 @@ if st.button("Analyze Risk Level", type="primary", use_container_width=True):
     
     col_res1, col_res2 = st.columns([1, 2])
     with col_res1:
-        st.subheader("Result:")
+        st.subheader("Predicted result of percentage Glycated Hemoglobin - average blood sugar levels over 2-3 months:")
+    with col_res2:
+        st.markdown("---")
         if glyhb >= 6.5:
             st.error(f"### {glyhb:.2f}% (Diabetes)")
         elif glyhb >= 5.7:
