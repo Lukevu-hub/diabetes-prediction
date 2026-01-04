@@ -84,11 +84,16 @@ if model is None:
     st.error(f"❌ Can not find file model: `{model_path}`")
     st.stop()
 
+# --- 4. Main Dashboard ---
 input_df = get_user_inputs()
 
+# --- AGE GROUP ---
 age_bins = [0, 20, 30, 40, 50, 60, 100]
 age_labels = ["<20", "21-30", "31-40", "41-50", "51-60", "60+"]
-input_df['age_group'] = pd.cut(input_df['age'], bins=age_bins, labels=age_labels)
+
+# Tính toán age_group để hiển thị, KHÔNG gán vào input_df
+current_age = input_df['age'].iloc[0]
+current_age_group = pd.cut([current_age], bins=age_bins, labels=age_labels)[0]
 
 # Metrics Display
 st.subheader("📊 Key Metrics")
@@ -98,10 +103,11 @@ with col1:
 with col2:
     st.metric("Glucose/HDL Ratio", f"{input_df['ratio'].iloc[0]:.2f}")
 with col3:
-    # Display processed Age Group
-    st.metric("Age Group", value=input_df['age_group'].iloc[0])
+    # Show Age Group
+    st.metric("Age Group", value=str(current_age_group))
 
 st.subheader("📋 Input Summary")
+# Display dataframe (only 8 columns) for debugging if needed
 st.dataframe(input_df, use_container_width=True)
 
 # --- 5. Prediction ---
