@@ -66,7 +66,7 @@ def get_user_inputs():
 # --- 4. Main Dashboard ---
 st.title("🩺 Diabetes Risk Prediction")
 st.markdown(f"**Developer:** Luke Vu  |  **Target:** Applied ML Engineer")
-st.info("Disclaimer: This tool is for educational purposes only and not a substitute for professional medical advice.")
+st.warning("Disclaimer: This tool is for educational purposes only and not a substitute for professional medical advice.")
 
 
 st.divider()
