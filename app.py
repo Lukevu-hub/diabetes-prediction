@@ -18,7 +18,7 @@ model = load_model(model_path)
 
 # --- 2. Bộ chuyển đổi đơn vị (Helper Function) ---
 def convert_units():
-    with st.sidebar.expander("🔄 Quick Unit Converter (Imperial/Metric)", expanded=False):        
+    with st.sidebar.expander("🔄 Quick Unit Converter)", expanded=False):        
         # Cân nặng & Chiều cao
         lbs = st.number_input("Weight (lbs)", value=154.0)
         st.info(f"**{lbs / 2.2046:.2f} kg**")
