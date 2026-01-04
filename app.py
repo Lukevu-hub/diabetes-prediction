@@ -22,15 +22,15 @@ def get_user_inputs():
     
     with st.sidebar.expander("🩸 Blood Test Results", expanded=True):
         chol = st.number_input("Total Cholesterol (mg/dL)", 100, 500, 200)
-        hdl = st.number_input("HDL - Good Cholesterol (mg/dL)", 10, 120, 50)
+        hdl = st.number_input("HDL (mg/dL)", 10, 120, 50)
         stab_glu = st.number_input("Stabilized Glucose (mg/dL)", 40, 400, 100)
         
     with st.sidebar.expander("📏 Physical Measurements", expanded=True):
         age = st.slider("Age", 18, 100, 45)
-        weight = st.number_input("Weight (kg)", 30.0, 200.0, 70.0)
-        height = st.number_input("Height (cm)", 100.0, 250.0, 170.0)
         waist = st.slider("Waist (cm)", 20, 150, 80)
         hip = st.slider("Hip (cm)", 20, 150, 95)
+        weight = st.number_input("Weight (kg)", 30.0, 200.0, 70.0)
+        height = st.number_input("Height (cm)", 100.0, 250.0, 170.0)
 
     # Feature Engineering 
     ratio = stab_glu / hdl
